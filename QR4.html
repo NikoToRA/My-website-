@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #text-input {
+            width: 60%; /* PCや大きな画面用の幅 */
+            height: 70vh; /* 縦幅はビューポートの高さの70% */
+            margin-bottom: 1%;
+    
+        }
+
+        #generate-button {
+            font-size: 20px; /* フォントサイズを大きく */
+            padding: 15px 30px; /* ボタンのパディングを増やす */
+            background-color: grey; /* 背景色をグレーに */
+            color: red; /* テキスト色を赤に */
+            border: none; /* ボーダーをなしに */
+            border-radius: 5px; /* 角を丸く */
+            cursor: pointer; /* カーソルをポインターに */
+        }
+
+        #generate-button:hover {
+            background-color: #666; /* ホバー時の背景色 */
+        }
+
+        #qrcode img {
+            margin-top: 15px;
+        }
+
+        /* スマートフォン向けのスタイル */
+        @media screen and (max-width: 600px) {
+            #text-input {
+                width: 100%; /* スマホ画面いっぱいの幅 */
+                height: 66vh; /* 高さをビューポートの高さの2/3に設定 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>テキストからQRコードジェネレータ</h1>
+    <textarea id="text-input" rows="4" cols="50"></textarea><br>
+    <button id="generate-button">QRコード生成</button>
+    <div id="qrcode"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+    <script>
+        document.getElementById('generate-button').addEventListener('click', function() {
+            var text = document.getElementById('text-input').value;
+            if (text.length > 1000) {
+                alert('テキストは1000文字以下にしてください。');
+                return;
+            }
+
+            var segments = splitText(text, 400);
+            var qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = '';
+
+            segments.forEach(function(segment, index) {
+                var qr = document.createElement('div');
+                qrcodeContainer.appendChild(qr);
+
+                QRCode.toDataURL(segment, { width: 200, height: 200 }, function (err, url) {
+                    var img = document.createElement('img');
+                    img.src = url;
+                    qr.appendChild(img);
+                });
+            });
+        });
+
+        function splitText(text, maxLength) {
+            var segments = [];
+            for (var i = 0; i < text.length; i += maxLength) {
+                segments.push(text.substring(i, i + maxLength));
+            }
+            return segments;
+        }
+    </script>
+</body>
+</html>
